@@ -441,6 +441,48 @@ static int board_imx_tzasc_configure(vaddr_t addr)
 
 	return 0;
 }
+#elif defined(PLATFORM_FLAVOR_mx8mn_iwg37m)
+static int board_imx_tzasc_configure(vaddr_t addr)
+{
+	tzc_init(addr);
+
+	tzc_configure_region(0, 0x00000000, TZC_ATTR_SP_S_RW);
+
+	/* 
+	 * Like with i.MX 8MQ, The DDR mapping seems to start at 0.
+	 */
+	tzc_configure_region(1, 0x00000000,
+		TZC_ATTR_REGION_SIZE(TZC_REGION_SIZE_2G) |
+		TZC_ATTR_REGION_EN_MASK | TZC_ATTR_SP_NS_RW 
+		| TZC_ATTR_SUBREGION_DIS(6)
+                | TZC_ATTR_SUBREGION_DIS(7)
+                );
+
+	tzc_configure_region(2, (CFG_TZDRAM_START - DRAM0_BASE),
+		TZC_ATTR_REGION_SIZE(TZC_REGION_SIZE_32M) |
+		TZC_ATTR_REGION_EN_MASK | TZC_ATTR_SP_S_RW);
+	tzc_configure_region(3, (CFG_SHMEM_START  - DRAM0_BASE),
+		TZC_ATTR_REGION_SIZE(TZC_REGION_SIZE_4M) |
+		TZC_ATTR_REGION_EN_MASK | TZC_ATTR_SP_ALL);
+
+#ifdef CFG_DRM_SECURE_DATA_PATH
+	tzc_configure_region(4, CFG_TEE_SDP_MEM_BASE - DRAM0_BASE,
+		TZC_ATTR_REGION_SIZE(TZC_REGION_SIZE_32M) |
+		TZC_ATTR_REGION_EN_MASK | TZC_ATTR_SP_ALL);
+#ifdef CFG_RDC_SECURE_DATA_PATH
+	/* Decoded buffer size is 128MB */
+	tzc_configure_region(5, CFG_RDC_DECODED_BUFFER - DRAM0_BASE,
+		TZC_ATTR_REGION_SIZE(TZC_REGION_SIZE_128M) |
+		TZC_ATTR_REGION_EN_MASK | TZC_ATTR_SP_ALL);
+#endif
+#endif
+
+	tzc_set_action(3);
+
+	tzc_dump_state();
+
+	return 0;
+}
 #else
 #error "No tzasc defined"
 #endif

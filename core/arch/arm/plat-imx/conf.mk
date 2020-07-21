@@ -16,7 +16,7 @@ mx7s-flavorlist = mx7swarp7
 mx7ulp-flavorlist = mx7ulpevk
 mx8m-flavorlist = mx8mqevk
 mx8mm-flavorlist = mx8mmevk
-mx8mn-flavorlist = mx8mnevk
+mx8mn-flavorlist = mx8mnevk mx8mn_iwg37m
 mx8qm-flavorlist = mx8qmmek mx8qmlpddr4arm2
 mx8qx-flavorlist = mx8qxpmek mx8qxplpddr4arm2 mx8dxmek
 
@@ -445,6 +445,11 @@ endif
 ifneq (,$(filter $(PLATFORM_FLAVOR),mx8mnevk))
 CFG_DDR_SIZE ?= 0x80000000
 CFG_UART_BASE ?= UART2_BASE
+endif
+
+ifneq (,$(filter $(PLATFORM_FLAVOR),mx8mn_iwg37m))
+CFG_DDR_SIZE ?= 0x80000000
+CFG_UART_BASE ?= UART4_BASE
 endif
 
 ifneq (,$(filter $(PLATFORM_FLAVOR),mx8qmmek))
